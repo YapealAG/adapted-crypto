@@ -151,6 +151,7 @@ var (
 	oidSignatureECDSAWithSHA256 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 2}
 	oidSignatureECDSAWithSHA384 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 3}
 	oidSignatureECDSAWithSHA512 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 4}
+	oidSignatureRSAPSS          = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 10}
 )
 
 var hashOIDs = map[crypto.Hash]asn1.ObjectIdentifier{
@@ -179,10 +180,16 @@ var signatureAlgorithmDetails = []struct {
 	{x509.ECDSAWithSHA256, oidSignatureECDSAWithSHA256, x509.ECDSA, crypto.SHA256},
 	{x509.ECDSAWithSHA384, oidSignatureECDSAWithSHA384, x509.ECDSA, crypto.SHA384},
 	{x509.ECDSAWithSHA512, oidSignatureECDSAWithSHA512, x509.ECDSA, crypto.SHA512},
+	{x509.SHA256WithRSAPSS, oidSignatureRSAPSS, x509.RSA, crypto.SHA256},
+	{x509.SHA384WithRSAPSS, oidSignatureRSAPSS, x509.RSA, crypto.SHA384},
+	{x509.SHA512WithRSAPSS, oidSignatureRSAPSS, x509.RSA, crypto.SHA512},
 }
 
 // TODO(rlb): This is also from crypto/x509, so same comment as AGL's below
-func signingParamsForPublicKey(pub interface{}, requestedSigAlgo x509.SignatureAlgorithm) (hashFunc crypto.Hash, sigAlgo pkix.AlgorithmIdentifier, err error) {
+func signingParamsForPublicKey(
+	pub interface{},
+	requestedSigAlgo x509.SignatureAlgorithm,
+) (hashFunc crypto.Hash, sigAlgo pkix.AlgorithmIdentifier, err error) {
 	var pubType x509.PublicKeyAlgorithm
 
 	switch pub := pub.(type) {
